@@ -37,7 +37,9 @@ function createMcpServer(token: string): McpServer {
     "get_profile",
     {
       description: "Fetch the profile details of the authenticated user.",
-      inputSchema: z.object({}),
+      inputSchema: z.object({
+        _meta: z.string().optional().describe("Ignored"),
+      }),
     },
     async () => {
       const output = await getProfile(token);
@@ -92,7 +94,9 @@ function createMcpServer(token: string): McpServer {
     "get_assets",
     {
       description: "Fetch all user financial assets (bank accounts, wallets, etc.).",
-      inputSchema: z.object({}),
+      inputSchema: z.object({
+        _meta: z.string().optional().describe("Ignored"),
+      }),
     },
     async () => {
       const output = await getAssets(token);
@@ -107,7 +111,9 @@ function createMcpServer(token: string): McpServer {
     "get_loans",
     {
       description: "Fetch list of active loans given by the user to others.",
-      inputSchema: z.object({}),
+      inputSchema: z.object({
+        _meta: z.string().optional().describe("Ignored"),
+      }),
     },
     async () => {
       const output = await getLoans(token);
@@ -123,7 +129,9 @@ function createMcpServer(token: string): McpServer {
     "get_borrowings",
     {
       description: "Fetch list of borrowings and debts owed by the user to lenders.",
-      inputSchema: z.object({}),
+      inputSchema: z.object({
+        _meta: z.string().optional().describe("Ignored"),
+      }),
     },
     async () => {
       const output = await getBorrowings(token);
@@ -139,7 +147,9 @@ function createMcpServer(token: string): McpServer {
     "get_summary",
     {
       description: "Fetch financial aggregates including income, expenses, and loan totals.",
-      inputSchema: z.object({}),
+      inputSchema: z.object({
+        _meta: z.string().optional().describe("Ignored"),
+      }),
     },
     async () => {
       const output = await getSummary(token);
