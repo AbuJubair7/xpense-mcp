@@ -38,7 +38,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch the profile details of the authenticated user.",
       inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
+        _meta: z.string().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -55,7 +55,6 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch up to 10 recent expense transactions. You can optionally filter by category and date range.",
       inputSchema: z.object({
-        fetch_all: z.boolean().optional().describe("Set to true to fetch records"),
         category: z.string().optional().describe("Filter by category (e.g. Food, Rent, Utilities)"),
         startDate: z.string().optional().describe("Start date in YYYY-MM-DD format"),
         endDate: z.string().optional().describe("End date in YYYY-MM-DD format"),
@@ -76,7 +75,6 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch up to 10 recent income transactions. You can optionally filter by source and date range.",
       inputSchema: z.object({
-        fetch_all: z.boolean().optional().describe("Set to true to fetch records"),
         source: z.string().optional().describe("Filter by source (e.g. Salary, Freelance)"),
         startDate: z.string().optional().describe("Start date in YYYY-MM-DD format"),
         endDate: z.string().optional().describe("End date in YYYY-MM-DD format"),
@@ -97,7 +95,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch all user financial assets (bank accounts, wallets, etc.).",
       inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
+        _meta: z.string().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -114,7 +112,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch list of active loans given by the user to others.",
       inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
+        _meta: z.string().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -132,7 +130,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch list of borrowings and debts owed by the user to lenders.",
       inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
+        _meta: z.string().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -150,7 +148,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch financial aggregates including income, expenses, and loan totals.",
       inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
+        _meta: z.string().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -216,8 +214,8 @@ app.get("/health", (_req: Request, res: Response) => {
 
 // MCP endpoint
 app.post("/mcp", async (req: Request, res: Response) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : "";
+  const authHeader = req.headers["x-xpense-token"] || req.headers.authorization;
+  const token = typeof authHeader === 'string' && authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : "";
 
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
