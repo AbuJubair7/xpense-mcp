@@ -214,8 +214,8 @@ app.get("/health", (_req: Request, res: Response) => {
 
 // MCP endpoint
 app.post("/mcp", async (req: Request, res: Response) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : "";
+  const authHeader = req.headers["x-xpense-token"] || req.headers.authorization;
+  const token = typeof authHeader === 'string' && authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : "";
 
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
