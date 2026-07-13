@@ -38,7 +38,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch the profile details of the authenticated user.",
       inputSchema: z.object({
-        _meta: z.string().optional().describe("Ignored"),
+        _meta: z.string().nullable().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -55,9 +55,9 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch up to 10 recent expense transactions. You can optionally filter by category and date range.",
       inputSchema: z.object({
-        category: z.string().optional().describe("Filter by category (e.g. Food, Rent, Utilities)"),
-        startDate: z.string().optional().describe("Start date in YYYY-MM-DD format"),
-        endDate: z.string().optional().describe("End date in YYYY-MM-DD format"),
+        category: z.string().nullable().optional().describe("Filter by category (e.g. Food, Rent, Utilities)"),
+        startDate: z.string().nullable().optional().describe("Start date in YYYY-MM-DD format"),
+        endDate: z.string().nullable().optional().describe("End date in YYYY-MM-DD format"),
       }),
     },
     async (args) => {
@@ -75,9 +75,9 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch up to 10 recent income transactions. You can optionally filter by source and date range.",
       inputSchema: z.object({
-        source: z.string().optional().describe("Filter by source (e.g. Salary, Freelance)"),
-        startDate: z.string().optional().describe("Start date in YYYY-MM-DD format"),
-        endDate: z.string().optional().describe("End date in YYYY-MM-DD format"),
+        source: z.string().nullable().optional().describe("Filter by source (e.g. Salary, Freelance)"),
+        startDate: z.string().nullable().optional().describe("Start date in YYYY-MM-DD format"),
+        endDate: z.string().nullable().optional().describe("End date in YYYY-MM-DD format"),
       }),
     },
     async (args) => {
@@ -95,7 +95,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch all user financial assets (bank accounts, wallets, etc.).",
       inputSchema: z.object({
-        _meta: z.string().optional().describe("Ignored"),
+        _meta: z.string().nullable().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -112,7 +112,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch list of active loans given by the user to others.",
       inputSchema: z.object({
-        _meta: z.string().optional().describe("Ignored"),
+        _meta: z.string().nullable().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -130,7 +130,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch list of borrowings and debts owed by the user to lenders.",
       inputSchema: z.object({
-        _meta: z.string().optional().describe("Ignored"),
+        _meta: z.string().nullable().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -148,7 +148,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch financial aggregates including income, expenses, and loan totals.",
       inputSchema: z.object({
-        _meta: z.string().optional().describe("Ignored"),
+        _meta: z.string().nullable().optional().describe("Ignored"),
       }),
     },
     async () => {
@@ -166,8 +166,8 @@ function createMcpServer(token: string): McpServer {
       description: "Fetch aggregated spending analytics, including total spending, category breakdown, and timeline data. Use this instead of fetching raw expenses when you need to calculate totals or summarize spending.",
       inputSchema: z.object({
         filterType: z.enum(["day", "month", "year"]).describe("The grouping type for the timeline data"),
-        fromDate: z.string().optional().describe("Start date (YYYY-MM-DD for day, YYYY-MM for month, YYYY for year)"),
-        toDate: z.string().optional().describe("End date (YYYY-MM-DD for day, YYYY-MM for month, YYYY for year)"),
+        fromDate: z.string().nullable().optional().describe("Start date (YYYY-MM-DD for day, YYYY-MM for month, YYYY for year)"),
+        toDate: z.string().nullable().optional().describe("End date (YYYY-MM-DD for day, YYYY-MM for month, YYYY for year)"),
       }),
     },
     async (args) => {
@@ -185,8 +185,8 @@ function createMcpServer(token: string): McpServer {
       description: "Fetch the user's average spending over time (e.g. average daily, monthly, or yearly spend).",
       inputSchema: z.object({
         type: z.enum(["day", "month", "year"]).describe("The interval to calculate averages for"),
-        fromDate: z.string().optional().describe("Start date"),
-        toDate: z.string().optional().describe("End date"),
+        fromDate: z.string().nullable().optional().describe("Start date"),
+        toDate: z.string().nullable().optional().describe("End date"),
       }),
     },
     async (args) => {

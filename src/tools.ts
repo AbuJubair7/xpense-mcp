@@ -31,7 +31,7 @@ export async function getProfile(token: string) {
 }
 
 // 2. Fetch list of expenses
-export async function getExpenses(token: string, limit = 10, category?: string, startDate?: string, endDate?: string) {
+export async function getExpenses(token: string, limit = 10, category?: string | null, startDate?: string | null, endDate?: string | null) {
   let url = `/expenses?limit=${limit}`;
   if (category) url += `&category=${encodeURIComponent(category)}`;
   if (startDate) url += `&startDate=${encodeURIComponent(startDate)}`;
@@ -40,7 +40,7 @@ export async function getExpenses(token: string, limit = 10, category?: string, 
 }
 
 // 3. Fetch list of incomes
-export async function getIncome(token: string, limit = 10, source?: string, startDate?: string, endDate?: string) {
+export async function getIncome(token: string, limit = 10, source?: string | null, startDate?: string | null, endDate?: string | null) {
   let url = `/income?limit=${limit}`;
   if (source) url += `&source=${encodeURIComponent(source)}`;
   if (startDate) url += `&startDate=${encodeURIComponent(startDate)}`;
@@ -72,8 +72,8 @@ export async function getSummary(token: string) {
 export async function getSpendingAnalytics(
   token: string,
   filterType: "day" | "month" | "year",
-  fromDate?: string,
-  toDate?: string
+  fromDate?: string | null,
+  toDate?: string | null
 ) {
   let url = `/analytics/history?`;
   if (filterType === "day") {
@@ -93,8 +93,8 @@ export async function getSpendingAnalytics(
 export async function getSpendingAverages(
   token: string,
   type: "day" | "month" | "year",
-  fromDate?: string,
-  toDate?: string
+  fromDate?: string | null,
+  toDate?: string | null
 ) {
   let url = `/analytics/averages?type=${encodeURIComponent(type)}`;
   if (fromDate) url += `&fromDate=${encodeURIComponent(fromDate)}`;
