@@ -11,6 +11,8 @@ import {
   getLoans,
   getBorrowings,
   getSummary,
+  getSpendingAnalytics,
+  getSpendingAverages,
 } from "./tools.js";
 
 // ============================================================================
@@ -33,12 +35,16 @@ function createMcpServer(token: string): McpServer {
   // 1. Register get_profile tool
   server.registerTool(
     "get_profile",
-    { description: "Fetch the profile details of the authenticated user." },
+    {
+      description: "Fetch the profile details of the authenticated user.",
+      inputSchema: z.object({
+        fetch_all: z.boolean().describe("Set to true to fetch records"),
+      }),
+    },
     async () => {
       const output = await getProfile(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
-        structuredContent: output,
       };
     },
   );
@@ -46,12 +52,20 @@ function createMcpServer(token: string): McpServer {
   // 2. Register get_expenses tool
   server.registerTool(
     "get_expenses",
-    { description: "Fetch all expense transactions recorded by the user." },
-    async () => {
-      const output = await getExpenses(token);
+    {
+      description: "Fetch up to 10 recent expense transactions. You can optionally filter by category and date range.",
+      inputSchema: z.object({
+        fetch_all: z.boolean().optional().describe("Set to true to fetch records"),
+        category: z.string().optional().describe("Filter by category (e.g. Food, Rent, Utilities)"),
+        startDate: z.string().optional().describe("Start date in YYYY-MM-DD format"),
+        endDate: z.string().optional().describe("End date in YYYY-MM-DD format"),
+      }),
+    },
+    async (args) => {
+      const output = await getExpenses(token, 10, args.category, args.startDate, args.endDate);
+      const limited = Array.isArray(output) ? output.slice(0, 10) : output;
       return {
-        content: [{ type: "text", text: JSON.stringify(output) }],
-        structuredContent: output,
+        content: [{ type: "text", text: JSON.stringify(limited) }],
       };
     },
   );
@@ -59,12 +73,20 @@ function createMcpServer(token: string): McpServer {
   // 3. Register get_income tool
   server.registerTool(
     "get_income",
-    { description: "Fetch all income transactions recorded by the user." },
-    async () => {
-      const output = await getIncome(token);
+    {
+      description: "Fetch up to 10 recent income transactions. You can optionally filter by source and date range.",
+      inputSchema: z.object({
+        fetch_all: z.boolean().optional().describe("Set to true to fetch records"),
+        source: z.string().optional().describe("Filter by source (e.g. Salary, Freelance)"),
+        startDate: z.string().optional().describe("Start date in YYYY-MM-DD format"),
+        endDate: z.string().optional().describe("End date in YYYY-MM-DD format"),
+      }),
+    },
+    async (args) => {
+      const output = await getIncome(token, 10, args.source, args.startDate, args.endDate);
+      const limited = Array.isArray(output) ? output.slice(0, 10) : output;
       return {
-        content: [{ type: "text", text: JSON.stringify(output) }],
-        structuredContent: output,
+        content: [{ type: "text", text: JSON.stringify(limited) }],
       };
     },
   );
@@ -72,12 +94,16 @@ function createMcpServer(token: string): McpServer {
   // 4. Register get_assets tool
   server.registerTool(
     "get_assets",
-    { description: "Fetch all user financial assets (bank accounts, wallets, etc.)." },
+    {
+      description: "Fetch all user financial assets (bank accounts, wallets, etc.).",
+      inputSchema: z.object({
+        fetch_all: z.boolean().describe("Set to true to fetch records"),
+      }),
+    },
     async () => {
       const output = await getAssets(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
-        structuredContent: output,
       };
     },
   );
@@ -85,12 +111,17 @@ function createMcpServer(token: string): McpServer {
   // 5. Register get_loans tool
   server.registerTool(
     "get_loans",
-    { description: "Fetch list of active loans given by the user to others." },
+    {
+      description: "Fetch list of active loans given by the user to others.",
+      inputSchema: z.object({
+        fetch_all: z.boolean().describe("Set to true to fetch records"),
+      }),
+    },
     async () => {
       const output = await getLoans(token);
+      const limited = Array.isArray(output) ? output.slice(0, 10) : output;
       return {
-        content: [{ type: "text", text: JSON.stringify(output) }],
-        structuredContent: output,
+        content: [{ type: "text", text: JSON.stringify(limited) }],
       };
     },
   );
@@ -98,12 +129,17 @@ function createMcpServer(token: string): McpServer {
   // 6. Register get_borrowings tool
   server.registerTool(
     "get_borrowings",
-    { description: "Fetch list of borrowings and debts owed by the user to lenders." },
+    {
+      description: "Fetch list of borrowings and debts owed by the user to lenders.",
+      inputSchema: z.object({
+        fetch_all: z.boolean().describe("Set to true to fetch records"),
+      }),
+    },
     async () => {
       const output = await getBorrowings(token);
+      const limited = Array.isArray(output) ? output.slice(0, 10) : output;
       return {
-        content: [{ type: "text", text: JSON.stringify(output) }],
-        structuredContent: output,
+        content: [{ type: "text", text: JSON.stringify(limited) }],
       };
     },
   );
@@ -111,12 +147,54 @@ function createMcpServer(token: string): McpServer {
   // 7. Register get_summary tool
   server.registerTool(
     "get_summary",
-    { description: "Fetch financial aggregates including income, expenses, and loan totals." },
+    {
+      description: "Fetch financial aggregates including income, expenses, and loan totals.",
+      inputSchema: z.object({
+        fetch_all: z.boolean().describe("Set to true to fetch records"),
+      }),
+    },
     async () => {
       const output = await getSummary(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
-        structuredContent: output,
+      };
+    },
+  );
+
+  // 8. Register get_spending_analytics tool
+  server.registerTool(
+    "get_spending_analytics",
+    {
+      description: "Fetch aggregated spending analytics, including total spending, category breakdown, and timeline data. Use this instead of fetching raw expenses when you need to calculate totals or summarize spending.",
+      inputSchema: z.object({
+        filterType: z.enum(["day", "month", "year"]).describe("The grouping type for the timeline data"),
+        fromDate: z.string().optional().describe("Start date (YYYY-MM-DD for day, YYYY-MM for month, YYYY for year)"),
+        toDate: z.string().optional().describe("End date (YYYY-MM-DD for day, YYYY-MM for month, YYYY for year)"),
+      }),
+    },
+    async (args) => {
+      const output = await getSpendingAnalytics(token, args.filterType, args.fromDate, args.toDate);
+      return {
+        content: [{ type: "text", text: JSON.stringify(output) }],
+      };
+    },
+  );
+
+  // 9. Register get_spending_averages tool
+  server.registerTool(
+    "get_spending_averages",
+    {
+      description: "Fetch the user's average spending over time (e.g. average daily, monthly, or yearly spend).",
+      inputSchema: z.object({
+        type: z.enum(["day", "month", "year"]).describe("The interval to calculate averages for"),
+        fromDate: z.string().optional().describe("Start date"),
+        toDate: z.string().optional().describe("End date"),
+      }),
+    },
+    async (args) => {
+      const output = await getSpendingAverages(token, args.type, args.fromDate, args.toDate);
+      return {
+        content: [{ type: "text", text: JSON.stringify(output) }],
       };
     },
   );
