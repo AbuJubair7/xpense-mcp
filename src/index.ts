@@ -37,9 +37,7 @@ function createMcpServer(token: string): McpServer {
     "get_profile",
     {
       description: "Fetch the profile details of the authenticated user.",
-      inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
-      }),
+      inputSchema: z.object({}),
     },
     async () => {
       const output = await getProfile(token);
@@ -55,7 +53,6 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch up to 10 recent expense transactions. You can optionally filter by category and date range.",
       inputSchema: z.object({
-        fetch_all: z.boolean().optional().describe("Set to true to fetch records"),
         category: z.string().optional().describe("Filter by category (e.g. Food, Rent, Utilities)"),
         startDate: z.string().optional().describe("Start date in YYYY-MM-DD format"),
         endDate: z.string().optional().describe("End date in YYYY-MM-DD format"),
@@ -76,7 +73,6 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch up to 10 recent income transactions. You can optionally filter by source and date range.",
       inputSchema: z.object({
-        fetch_all: z.boolean().optional().describe("Set to true to fetch records"),
         source: z.string().optional().describe("Filter by source (e.g. Salary, Freelance)"),
         startDate: z.string().optional().describe("Start date in YYYY-MM-DD format"),
         endDate: z.string().optional().describe("End date in YYYY-MM-DD format"),
@@ -96,9 +92,7 @@ function createMcpServer(token: string): McpServer {
     "get_assets",
     {
       description: "Fetch all user financial assets (bank accounts, wallets, etc.).",
-      inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
-      }),
+      inputSchema: z.object({}),
     },
     async () => {
       const output = await getAssets(token);
@@ -113,9 +107,7 @@ function createMcpServer(token: string): McpServer {
     "get_loans",
     {
       description: "Fetch list of active loans given by the user to others.",
-      inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
-      }),
+      inputSchema: z.object({}),
     },
     async () => {
       const output = await getLoans(token);
@@ -131,9 +123,7 @@ function createMcpServer(token: string): McpServer {
     "get_borrowings",
     {
       description: "Fetch list of borrowings and debts owed by the user to lenders.",
-      inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
-      }),
+      inputSchema: z.object({}),
     },
     async () => {
       const output = await getBorrowings(token);
@@ -149,9 +139,7 @@ function createMcpServer(token: string): McpServer {
     "get_summary",
     {
       description: "Fetch financial aggregates including income, expenses, and loan totals.",
-      inputSchema: z.object({
-        fetch_all: z.boolean().describe("Set to true to fetch records"),
-      }),
+      inputSchema: z.object({}),
     },
     async () => {
       const output = await getSummary(token);
