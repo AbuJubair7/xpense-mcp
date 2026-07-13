@@ -24,7 +24,7 @@ const isDev = process.env.NODE_ENV !== "production";
 // ============================================================================
 
 // Build a FRESH MCP server per request to handle stateless HTTP/SSE.
-function createMcpServer(): McpServer {
+function createMcpServer(token: string): McpServer {
   const server = new McpServer({
     name: "xpense-mcp",
     version: "1.0.0",
@@ -33,14 +33,8 @@ function createMcpServer(): McpServer {
   // 1. Register get_profile tool
   server.registerTool(
     "get_profile",
-    {
-      title: "Get Profile",
-      description: "Fetch the profile details of the authenticated user.",
-      inputSchema: {
-        token: z.string().describe("JWT token for authorization"),
-      },
-    },
-    async ({ token }) => {
+    { description: "Fetch the profile details of the authenticated user." },
+    async () => {
       const output = await getProfile(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
@@ -52,14 +46,8 @@ function createMcpServer(): McpServer {
   // 2. Register get_expenses tool
   server.registerTool(
     "get_expenses",
-    {
-      title: "Get Expenses",
-      description: "Fetch all expense transactions recorded by the user.",
-      inputSchema: {
-        token: z.string().describe("JWT token for authorization"),
-      },
-    },
-    async ({ token }) => {
+    { description: "Fetch all expense transactions recorded by the user." },
+    async () => {
       const output = await getExpenses(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
@@ -71,14 +59,8 @@ function createMcpServer(): McpServer {
   // 3. Register get_income tool
   server.registerTool(
     "get_income",
-    {
-      title: "Get Income",
-      description: "Fetch all income transactions recorded by the user.",
-      inputSchema: {
-        token: z.string().describe("JWT token for authorization"),
-      },
-    },
-    async ({ token }) => {
+    { description: "Fetch all income transactions recorded by the user." },
+    async () => {
       const output = await getIncome(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
@@ -90,14 +72,8 @@ function createMcpServer(): McpServer {
   // 4. Register get_assets tool
   server.registerTool(
     "get_assets",
-    {
-      title: "Get Assets",
-      description: "Fetch all user financial assets (bank accounts, wallets, etc.).",
-      inputSchema: {
-        token: z.string().describe("JWT token for authorization"),
-      },
-    },
-    async ({ token }) => {
+    { description: "Fetch all user financial assets (bank accounts, wallets, etc.)." },
+    async () => {
       const output = await getAssets(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
@@ -109,14 +85,8 @@ function createMcpServer(): McpServer {
   // 5. Register get_loans tool
   server.registerTool(
     "get_loans",
-    {
-      title: "Get Loans",
-      description: "Fetch list of active loans given by the user to others.",
-      inputSchema: {
-        token: z.string().describe("JWT token for authorization"),
-      },
-    },
-    async ({ token }) => {
+    { description: "Fetch list of active loans given by the user to others." },
+    async () => {
       const output = await getLoans(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
@@ -128,14 +98,8 @@ function createMcpServer(): McpServer {
   // 6. Register get_borrowings tool
   server.registerTool(
     "get_borrowings",
-    {
-      title: "Get Borrowings",
-      description: "Fetch list of borrowings and debts owed by the user to lenders.",
-      inputSchema: {
-        token: z.string().describe("JWT token for authorization"),
-      },
-    },
-    async ({ token }) => {
+    { description: "Fetch list of borrowings and debts owed by the user to lenders." },
+    async () => {
       const output = await getBorrowings(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
@@ -147,14 +111,8 @@ function createMcpServer(): McpServer {
   // 7. Register get_summary tool
   server.registerTool(
     "get_summary",
-    {
-      title: "Get Financial Summary",
-      description: "Fetch financial aggregates including income, expenses, and loan totals.",
-      inputSchema: {
-        token: z.string().describe("JWT token for authorization"),
-      },
-    },
-    async ({ token }) => {
+    { description: "Fetch financial aggregates including income, expenses, and loan totals." },
+    async () => {
       const output = await getSummary(token);
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
@@ -180,6 +138,9 @@ app.get("/health", (_req: Request, res: Response) => {
 
 // MCP endpoint
 app.post("/mcp", async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : "";
+
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,
@@ -189,7 +150,7 @@ app.post("/mcp", async (req: Request, res: Response) => {
     transport.close();
   });
 
-  const server = createMcpServer();
+  const server = createMcpServer(token);
   await server.connect(transport);
   await transport.handleRequest(req, res, req.body);
 });
