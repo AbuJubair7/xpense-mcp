@@ -165,7 +165,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch aggregated spending analytics, including total spending, category breakdown, and timeline data. Use this instead of fetching raw expenses when you need to calculate totals or summarize spending.",
       inputSchema: z.object({
-        filterType: z.enum(["day", "month", "year"]).describe("The grouping type for the timeline data"),
+        filterType: z.enum(["day", "month", "year"]).catch("month").optional().default("month").describe("The grouping type for the timeline data"),
         fromDate: z.string().optional().catch(undefined).describe("Start date (YYYY-MM-DD for day, YYYY-MM for month, YYYY for year)"),
         toDate: z.string().optional().catch(undefined).describe("End date (YYYY-MM-DD for day, YYYY-MM for month, YYYY for year)"),
       }),
@@ -184,7 +184,7 @@ function createMcpServer(token: string): McpServer {
     {
       description: "Fetch the user's average spending over time (e.g. average daily, monthly, or yearly spend).",
       inputSchema: z.object({
-        type: z.enum(["day", "month", "year"]).describe("The interval to calculate averages for"),
+        type: z.enum(["day", "month", "year"]).catch("month").optional().default("month").describe("The interval to calculate averages for"),
         fromDate: z.string().optional().catch(undefined).describe("Start date"),
         toDate: z.string().optional().catch(undefined).describe("End date"),
       }),
