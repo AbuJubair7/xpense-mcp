@@ -8,6 +8,8 @@ const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001/api";
 // General-purpose helper function to fetch data from the NestJS backend
 async function apiRequest(path: string, token: string): Promise<any> {
   const url = `${BACKEND_URL}${path}`;
+  console.log(`[MCP Tool] Fetching data from: ${url}`);
+  
   const response = await fetch(url, {
     method: "GET",
     headers: {
@@ -19,10 +21,13 @@ async function apiRequest(path: string, token: string): Promise<any> {
   if (!response.ok) {
     const errorBody = await response.json().catch(() => ({}));
     const message = errorBody.message || `HTTP error! status: ${response.status}`;
+    console.error(`[MCP Tool] Error fetching from ${url}:`, message);
     throw new Error(message);
   }
 
-  return response.json();
+  const data = await response.json();
+  console.log(`[MCP Tool] Successfully fetched data from ${url}. Response size: ${JSON.stringify(data).length} characters`);
+  return data;
 }
 
 // 1. Fetch authenticated user profile info
