@@ -216,8 +216,10 @@ app.get("/health", (_req: Request, res: Response) => {
 // MCP endpoint
 app.post("/mcp", async (req: Request, res: Response) => {
   console.log("[MCP Tool] Incoming headers:", JSON.stringify(req.headers));
-  const authHeader = req.headers["x-xpense-token"] || req.headers.authorization;
-  const token = typeof authHeader === 'string' && authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : "";
+  console.log("[MCP Tool] Incoming query:", JSON.stringify(req.query));
+  
+  // Extract token from query parameters because mcpize.run strips custom headers
+  const token = (req.query.token as string) || "";
 
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
