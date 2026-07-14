@@ -214,11 +214,13 @@ app.get("/health", (_req: Request, res: Response) => {
 });
 
 // MCP endpoint
-app.post(["/mcp", "/mcp/:token"], async (req: Request, res: Response) => {
+app.post("/mcp", async (req: Request, res: Response) => {
   console.log("[MCP Tool] Incoming headers:", JSON.stringify(req.headers));
   
-  // Extract token from URL Path because the proxy aggressively strips custom headers and query params
-  const token = req.params.token || "";
+  // Extract token from Content-Type parameter because proxy allows this natively
+  const contentType = req.headers["content-type"] || "";
+  const tokenMatch = contentType.match(/x-token="([^"]*)"/);
+  const token = tokenMatch ? tokenMatch[1] : "";
 
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
