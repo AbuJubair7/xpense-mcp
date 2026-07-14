@@ -10,6 +10,7 @@ const BACKEND_URL =
 async function apiRequest(path: string, token: string): Promise<any> {
   const url = `${BACKEND_URL}${path}`;
   console.log(`[MCP Tool] Fetching data from: ${url}`);
+  console.log(`[MCP Tool] Token received: ${token ? `YES (${token.length} chars)` : "EMPTY"}`);
 
   const response = await fetch(url, {
     method: "GET",
