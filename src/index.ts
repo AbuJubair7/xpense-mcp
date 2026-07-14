@@ -217,9 +217,12 @@ app.get("/health", (_req: Request, res: Response) => {
 app.post("/mcp", async (req: Request, res: Response) => {
   console.log("[MCP Tool] Incoming headers:", JSON.stringify(req.headers));
   console.log("[MCP Tool] Incoming query:", JSON.stringify(req.query));
+  console.log("[MCP Tool] Incoming cookies:", req.headers.cookie);
   
-  // Extract token from query parameters because mcpize.run strips custom headers
-  const token = (req.query.token as string) || "";
+  // Extract token from query parameters or cookies because mcpize.run strips custom headers
+  const cookieMatch = req.headers.cookie?.match(/xpense_token=([^;]+)/);
+  const cookieToken = cookieMatch ? cookieMatch[1] : "";
+  const token = (req.query.token as string) || cookieToken || "";
 
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
