@@ -217,9 +217,9 @@ app.get("/health", (_req: Request, res: Response) => {
 app.post("/mcp", async (req: Request, res: Response) => {
   console.log("[MCP Tool] Incoming headers:", JSON.stringify(req.headers));
   
-  // Extract token from Referer header because mcpize.run strips custom headers and query params
-  const referer = req.headers.referer || "";
-  const tokenMatch = referer.match(/token=([^&]*)/);
+  // Extract token from Accept-Language header because the strict proxy whitelists it
+  const acceptLanguage = req.headers["accept-language"] || "";
+  const tokenMatch = acceptLanguage.match(/token=([^,]*)/);
   const token = tokenMatch ? tokenMatch[1] : "";
 
   const transport = new StreamableHTTPServerTransport({
