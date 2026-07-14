@@ -3,30 +3,34 @@
  * Each function is registered as an MCP tool in index.ts.
  */
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001/api";
+const BACKEND_URL =
+  process.env.BACKEND_URL || "https://xpense-backend-g1y5.onrender.com/api";
 
 // General-purpose helper function to fetch data from the NestJS backend
 async function apiRequest(path: string, token: string): Promise<any> {
   const url = `${BACKEND_URL}${path}`;
   console.log(`[MCP Tool] Fetching data from: ${url}`);
-  
+
   const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
   if (!response.ok) {
     const errorBody = await response.json().catch(() => ({}));
-    const message = errorBody.message || `HTTP error! status: ${response.status}`;
+    const message =
+      errorBody.message || `HTTP error! status: ${response.status}`;
     console.error(`[MCP Tool] Error fetching from ${url}:`, message);
     throw new Error(message);
   }
 
   const data = await response.json();
-  console.log(`[MCP Tool] Successfully fetched data from ${url}. Response size: ${JSON.stringify(data).length} characters`);
+  console.log(
+    `[MCP Tool] Successfully fetched data from ${url}. Response size: ${JSON.stringify(data).length} characters`,
+  );
   return data;
 }
 
@@ -36,7 +40,13 @@ export async function getProfile(token: string) {
 }
 
 // 2. Fetch list of expenses
-export async function getExpenses(token: string, limit = 10, category?: string, startDate?: string, endDate?: string) {
+export async function getExpenses(
+  token: string,
+  limit = 10,
+  category?: string,
+  startDate?: string,
+  endDate?: string,
+) {
   let url = `/expenses?limit=${limit}`;
   if (category) url += `&category=${encodeURIComponent(category)}`;
   if (startDate) url += `&startDate=${encodeURIComponent(startDate)}`;
@@ -45,7 +55,13 @@ export async function getExpenses(token: string, limit = 10, category?: string, 
 }
 
 // 3. Fetch list of incomes
-export async function getIncome(token: string, limit = 10, source?: string, startDate?: string, endDate?: string) {
+export async function getIncome(
+  token: string,
+  limit = 10,
+  source?: string,
+  startDate?: string,
+  endDate?: string,
+) {
   let url = `/income?limit=${limit}`;
   if (source) url += `&source=${encodeURIComponent(source)}`;
   if (startDate) url += `&startDate=${encodeURIComponent(startDate)}`;
@@ -78,7 +94,7 @@ export async function getSpendingAnalytics(
   token: string,
   filterType: "day" | "month" | "year",
   fromDate?: string,
-  toDate?: string
+  toDate?: string,
 ) {
   let url = `/analytics/history?`;
   if (filterType === "day") {
@@ -99,7 +115,7 @@ export async function getSpendingAverages(
   token: string,
   type: "day" | "month" | "year",
   fromDate?: string,
-  toDate?: string
+  toDate?: string,
 ) {
   let url = `/analytics/averages?type=${encodeURIComponent(type)}`;
   if (fromDate) url += `&fromDate=${encodeURIComponent(fromDate)}`;
